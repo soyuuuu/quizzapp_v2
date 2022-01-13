@@ -1,6 +1,6 @@
 # quizzapp_v2
 
-A new Flutter project.
+The exercise for week 11.
 
 ## Getting Started
 
