@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'quiz-brain.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 // TODO 4: import rflutter package
-
 QuizBrain quizBrain = QuizBrain();
 
 void main() => runApp(Quizzler());
@@ -12,7 +12,7 @@ class Quizzler extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         // TODO 6.ปรับปรุง UI ตามชอบ
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.yellow,
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0),
@@ -36,7 +36,6 @@ class _QuizPageState extends State<QuizPage> {
 
   void checkAnswer(bool user_ans) {
     bool correctAnswer = quizBrain.getQuestionAnswer()!;
-
     // TODO 5: ปรับแก้โค้ดโดย ถ้าคำถามหมดแล้วให้ 1)โชว์ alert โดยใช้ rflutter_alert , 2) รีเซต questionNumber ให้เป็นศูนย์ด้วยเมธอด reset, 3) เซตให้ scoreKeeper เป็นลิสต์ว่าง และ 4) เซต totalScore ให้เป็นศูนย์
     setState(() {
       if (correctAnswer == user_ans) {
@@ -46,13 +45,34 @@ class _QuizPageState extends State<QuizPage> {
           Icons.check,
           color: Colors.green,
         ));
-        quizBrain.nextQuestion();
       } else {
         scoreKeeper.add(Icon(
           Icons.close,
           color: Colors.red,
         ));
-        quizBrain.nextQuestion();
+      }
+      if (quizBrain.isFinished()==false){
+      quizBrain.nextQuestion();
+      }
+      else{
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "OUT OF QUESTION",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "Retry",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+              width: 120,
+            )
+          ],
+        ).show();
+        quizBrain.reset();
+        scoreKeeper.clear();
+        totalScore=0;
       }
     });
 
@@ -127,28 +147,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 // TODO 2: ปรับแก้โดยการเรียกใช้ฟังก์ชัน checkAnswer
-                bool? correctAnswer = quizBrain.getQuestionAnswer();
-                if (correctAnswer == false) {
-                  setState(() {
-                    //เมื่อกดปุ่ม False เพิ่มข้อมูลเข้าไปในลิสต์ scoreKeeper โดยใช้ add method
-                    totalScore++;
-                    scoreKeeper.add(Icon(
-                      Icons.check,
-                      color: Colors.green,
-                    ));
-
-                    quizBrain.nextQuestion();
-                  });
-                } else {
-                  setState(() {
-                    scoreKeeper.add(Icon(
-                      Icons.close,
-                      color: Colors.red,
-                    ));
-
-                    quizBrain.nextQuestion();
-                  });
-                }
+                    checkAnswer(false);
               },
             ),
           ),
